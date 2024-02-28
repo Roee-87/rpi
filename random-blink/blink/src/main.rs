@@ -46,7 +46,7 @@ fn main() {
                     File::create("../my_pipe").expect("Failed to open the named pipe for writing");
 
                 // Send a request for a random number directly to program2
-                writeln!(pipe_writer, "generate_random_number")
+                writeln!(pipe_writer, "generate_random_number\n")
                     .expect("Failed to write to the named pipe");
 
                 print!("Request sent\n");

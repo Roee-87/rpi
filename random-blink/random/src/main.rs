@@ -46,7 +46,7 @@ fn main() {
             let mut pipe_writer = File::create("../my_pipe").expect("Failed to open the named pipe for writing");
 
             // Respond with the random number directly to program1
-            writeln!(pipe_writer, "{}", random_number).expect("Failed to write to the named pipe");
+            writeln!(pipe_writer, "{}\n", random_number).expect("Failed to write to the named pipe");
 
             print!("Program 2: Response sent successfully with: {}\n", random_number);
             io::stdout().flush().expect("Failed to flush stdout");
