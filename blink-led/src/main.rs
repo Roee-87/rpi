@@ -8,7 +8,7 @@ const GPIO_LED: u8 = 17;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut pin = Gpio::new()?.get(GPIO_LED)?.into_output();
-
+    pin.set_low();
     loop {
         println!("Enter number of blinks: ");
         let mut input = String::new();
