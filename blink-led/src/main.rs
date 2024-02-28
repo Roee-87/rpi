@@ -8,17 +8,32 @@ const GPIO_LED: u8 = 17;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut pin = Gpio::new()?.get(GPIO_LED)?.into_output();
-    pin.set_low();
+
     loop {
+        pin.set_high();
         println!("Enter number of blinks: ");
         let mut input = String::new();
-        std::io::stdin().read_line(&mut input).unwrap();
-        let input: u32 = input.trim().parse().unwrap();
-        for _ in 0..input {
-            pin.set_high();
-            thread::sleep(Duration::from_millis(500));
-            pin.set_low();
-            thread::sleep(Duration::from_millis(500));
+        std::io::stdin().read_line(&mut input)?;
+        
+        let input = input.trim();
+
+        match input.parse::<i32>() {
+            Ok(n) => {
+                for _ in 0..n {
+                    pin.set_high();
+                    thread::sleep(Duration::from_millis(250));
+                    pin.set_low();
+                    thread::sleep(Duration::from_millis(250));
+                }
+            }
+            Err(_) if input == "exit" => {
+                println!("Exiting the program");
+                break;
+            }
+            Err(_) => {
+                println!("Invalid input, please enter a number or 'exit'");
+            }
         }
     }
+    Ok(())
 }
