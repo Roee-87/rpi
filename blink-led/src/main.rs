@@ -5,7 +5,7 @@ use std::time::Duration;
 use rppal::gpio::Gpio;
 
 const GPIO_LED: u8 = 17;
-const BLINK_TIME: u32 = 250;
+const BLINK_TIME: u64 = 250;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut pin = Gpio::new()?.get(GPIO_LED)?.into_output();
