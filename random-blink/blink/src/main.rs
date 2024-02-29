@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 pipe_writer.flush().expect("Failed to flush the named pipe");
 
                 // Open the named pipe for reading
-                let mut pipe_reader =
+                let pipe_reader =
                     File::open(PIPE_2).expect("Failed to open the named pipe for reading");
                 let mut reader = BufReader::new(pipe_reader);
 

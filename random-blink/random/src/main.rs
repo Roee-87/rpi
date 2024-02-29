@@ -1,8 +1,6 @@
 use rand::Rng;
 use std::io::{self, BufRead, BufReader, Write};
 use std::fs::File;
-use std::thread;
-use std::time::Duration;
 
 const MAX_BLINKS: u32 = 20;
 
