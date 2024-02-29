@@ -1,4 +1,4 @@
-se rand::Rng;
+use rand::Rng;
 use std::io::{self, BufRead, BufReader, Write};
 use std::fs::File;
 use std::thread;
