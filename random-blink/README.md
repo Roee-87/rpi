@@ -1,3 +1,5 @@
+This branch makes use of FIFO named pipes.
+
 This code is cross-compiled to a Raspberry Pi 4B device running Ubuntu. Install cargo-cross. Set the target as follows for both `random` and `blink`:
 
 ```bash
