@@ -7,16 +7,16 @@ use std::time::Duration;
 const MAX_BLINKS: u32 = 20;
 
 #[cfg(target_os = "linux")]
-const PIPE_1: &`static str = "./pipe1";
+const PIPE_1: &'static str = "./pipe1";
 
 #[cfg(not(target_os = "linux"))]
-const PIPE_1: &`static str = "../pipe1";
+const PIPE_1: &'static str = "../pipe1";
 
 #[cfg(target_os = "linux")]
-const PIPE_2: &`static str = "./pipe2";
+const PIPE_2: &'static str = "./pipe2";
 
 #[cfg(not(target_os = "linux"))]
-const PIPE_2: &`static str = "../pipe2";
+const PIPE_2: &'static str = "../pipe2";
 
 fn main() {
     print!("Program 2: Waiting for request...");
