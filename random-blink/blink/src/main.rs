@@ -15,6 +15,7 @@ const PATH_RNG: &'static str = "../random/target/debug/random";
 
 #[cfg(target_os = "linux")]
 const GPIO_LED: u8 = 17;
+
 // blink time in milliseconds
 const BLINK_TIME: u64 = 250;
 
