@@ -8,6 +8,18 @@ use std::error::Error;
 use rppal::gpio::Gpio;
 
 #[cfg(target_os = "linux")]
+const PIPE_1: &`static str = "./pipe1";
+
+#[cfg(not(target_os = "linux"))]
+const PIPE_1: &`static str = "../pipe1";
+
+#[cfg(target_os = "linux")]
+const PIPE_2: &`static str = "./pipe2";
+
+#[cfg(not(target_os = "linux"))]
+const PIPE_2: &`static str = "../pipe2";
+
+#[cfg(target_os = "linux")]
 const PATH_RNG: &'static str = "./random";
 
 #[cfg(not(target_os = "linux"))]
