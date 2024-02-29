@@ -50,7 +50,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
                 // Open the named pipe for reading
                 let mut pipe_reader =
-                    File::open(PIPE_2)).expect("Failed to open the named pipe for reading");
+                    File::open(PIPE_2).expect("Failed to open the named pipe for reading");
                 let mut reader = BufReader::new(pipe_reader);
 
                 // Read the response from program2
