@@ -5,13 +5,10 @@ use std::time::Duration;
 #[cfg(target_os = "linux")]
 use rppal::gpio::Gpio;
 
-#[cfg(target_os = "linux")]
 const GPIO_RED_LED: u8 = 17;
 
-#[cfg(target_os = "linux")]
 const GPIO_GREEN_LED: u8 = 18;
 
-#[cfg(target_os = "linux")]
 const GPIO_BLUE_LED: u8 = 27;
 
 const COLOR: [u32; 6] = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF];
@@ -49,9 +46,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn set_color(hex_code: u32) -> Vec<f64> {
-    let red = (hex_code && 0xFF0000) >> 16 as u8;
-    let green = (hex_code && 0x00FF00) >> 8 as u8;
-    let blue = hex_code && 0x0000FF as u8;
+    let red = ((hex_code & 0xFF0000) >> 16) as u8;
+    let green = ((hex_code & 0x00FF00) >> 8) as u8;
+    let blue = (hex_code & 0x0000FF) as u8;
 
     let r_value = map_color(red);
     let g_value = map_color(green);
