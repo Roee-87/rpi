@@ -16,37 +16,39 @@ const GPIO_BLUE_LED: u8 = 27;
 
 const COLOR: [u32; 6] = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00FFFF];
 
-const PERIOD_MS: u64 = 20
-const PULSE_MIN_US: u64 = 1200;
+const FREQUENCY: f64 = 2000.0;
+const DUTY_CYCLE: f64 = 0.0;
 
 
 fn main() -> Result<(), Box<dyn Error>> {
+        
     #[cfg(target_os = "linux")]
     {
         let mut red_led = Gpio::new()?.get(GPIO_RED_LED)?.into_output();
         let mut green_led = Gpio::new()?.get(GPIO_GREEN_LED)?.into_output();
         let mut blue_led = Gpio::new()?.get(GPIO_BLUE_LED)?.into_output();
 
-        [red_led, green_led, blue_led].iter().for_each(|led| {
-            led.set_pwm(
-                Duration::from_millis(PERIOD_MS),
-                Duration::from_micros(PULSE_MIN_US),
-            )?;
+        let leds = vec![&mut red_led, &mut green_led, &mut blue_led];
+
+        leds.iter().for_each(|led| {
+            led.set_pwm_frequency(FREQUENCY, DUTY_CYCLE)?;
         });
 
         loop {
             for color in COLOR.iter() {
-                set_color(*color);
+                let color_vec = set_color(*color);
+                for (i, led) in leds.iter().enumerate() {
+                    led.set_pwm_frequency(FREQUENCY, color_vec[i])?;
+                };
                 thread::sleep(Duration::from_secs(1));
             }
         }
     }
 
-
     Ok(())
 }
 
-fn set_color(hex_code: u32) {
+fn set_color(hex_code: u32) -> Vec<f64> {
     let red = (hex_code && 0xFF0000) >> 16 as u8;
     let green = (hex_code && 0x00FF00) >> 8 as u8;
     let blue = hex_code && 0x0000FF as u8;
@@ -55,16 +57,11 @@ fn set_color(hex_code: u32) {
     let g_value = map_color(green);
     let b_value = map_color(blue);
 
-    #[cfg(target_os = "linux")]
-    {
-        red_led.write(red);
-        green_led.write(green);
-        blue_led.write(blue);
-    }
+    vec![r_value, g_value, b_value]
 }
 
-fn map_color(input: u8) -> f32 {
-    let input = input as f32;
+fn map_color(input: u8) -> f64 {
+    let input = input as f64;
     let input = input / 255.0;
     let input = input * 100.0;
     input
