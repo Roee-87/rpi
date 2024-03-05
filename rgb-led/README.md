@@ -1,1 +1,1 @@
-TODO:  Add readme
+Green LED is too bright, even when lowering the duty cycle.  Unclear.

@@ -33,8 +33,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             let color_vec = set_color(*color);
             for (i, led) in leds.iter_mut().enumerate() {
                 let _ = led.set_pwm_frequency(FREQUENCY, color_vec[i]);
+                println!("Color: {:?}, LED: {:?}, Duty Cycle: {:?}", color, i, color_vec[i]);
             }
             thread::sleep(Duration::from_secs(1));
+            leds.iter_mut().for_each(|led| {
+                let _ = led.set_pwm_frequency(FREQUENCY, DUTY_CYCLE);
+            });
+            thread::sleep(Duration::from_millis(500));
         }
     }
 
@@ -47,7 +52,7 @@ fn set_color(hex_code: u32) -> Vec<f64> {
     let blue = (hex_code & 0x0000FF) as u8;
 
     let r_value = map_color(red);
-    let g_value = map_color(green);
+    let g_value = map_color(green)/20.0; // Green is too bright
     let b_value = map_color(blue);
 
     vec![r_value, g_value, b_value]
