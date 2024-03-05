@@ -52,7 +52,7 @@ fn set_color(hex_code: u32) -> Vec<f64> {
     let blue = (hex_code & 0x0000FF) as u8;
 
     let r_value = map_color(red);
-    let g_value = map_color(green)/20.0; // Green is too bright
+    let g_value = map_color(green); // Green is too bright and doesn't change.  Adjusting the value to 10% does not affect the brightness....
     let b_value = map_color(blue);
 
     vec![r_value, g_value, b_value]
