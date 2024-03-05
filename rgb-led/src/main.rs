@@ -16,29 +16,25 @@ const COLOR: [u32; 6] = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF, 0x00F
 const FREQUENCY: f64 = 2000.0;
 const DUTY_CYCLE: f64 = 0.0;
 
-
+#[cfg(target_os = "linux")]
 fn main() -> Result<(), Box<dyn Error>> {
-        
-    #[cfg(target_os = "linux")]
-    {
-        let mut red_led = Gpio::new()?.get(GPIO_RED_LED)?.into_output();
-        let mut green_led = Gpio::new()?.get(GPIO_GREEN_LED)?.into_output();
-        let mut blue_led = Gpio::new()?.get(GPIO_BLUE_LED)?.into_output();
+    let mut red_led = Gpio::new()?.get(GPIO_RED_LED)?.into_output();
+    let mut green_led = Gpio::new()?.get(GPIO_GREEN_LED)?.into_output();
+    let mut blue_led = Gpio::new()?.get(GPIO_BLUE_LED)?.into_output();
 
-        let leds = vec![&mut red_led, &mut green_led, &mut blue_led];
+    let mut leds = vec![&mut red_led, &mut green_led, &mut blue_led];
 
-        leds.iter().for_each(|led| {
-            led.set_pwm_frequency(FREQUENCY, DUTY_CYCLE)?;
-        });
+    leds.iter_mut().for_each(|led| {
+        let _ = led.set_pwm_frequency(FREQUENCY, DUTY_CYCLE);
+    });
 
-        loop {
-            for color in COLOR.iter() {
-                let color_vec = set_color(*color);
-                for (i, led) in leds.iter().enumerate() {
-                    led.set_pwm_frequency(FREQUENCY, color_vec[i])?;
-                };
-                thread::sleep(Duration::from_secs(1));
+    for _ in 0..=100 {
+        for color in COLOR.iter() {
+            let color_vec = set_color(*color);
+            for (i, led) in leds.iter_mut().enumerate() {
+                let _ = led.set_pwm_frequency(FREQUENCY, color_vec[i]);
             }
+            thread::sleep(Duration::from_secs(1));
         }
     }
 
