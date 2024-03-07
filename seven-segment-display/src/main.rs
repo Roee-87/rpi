@@ -92,15 +92,15 @@ fn main() -> Result<(), Box<dyn Error>> {
         output_pins.hc595_shfit(NUMBER[counter % 10]);
 
         output_pins.clear();
-        data_pins.pick_digit(0);
+        data_pins.pick_digit(1);
         output_pins.hc595_shfit(NUMBER[(counter % 100) / 10]);
 
         output_pins.clear();
-        data_pins.pick_digit(0);
+        data_pins.pick_digit(2);
         output_pins.hc595_shfit(NUMBER[(counter % 1000) / 100]);
 
         output_pins.clear();
-        data_pins.pick_digit(0);
+        data_pins.pick_digit(3);
         output_pins.hc595_shfit(NUMBER[(counter % 10000) / 1000]);
         
         thread::sleep(Duration::from_millis(1000));
