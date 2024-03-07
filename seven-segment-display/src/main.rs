@@ -24,9 +24,9 @@ struct DigitData {
     right: OutputPin,
 }
 
-impl Outputs {
+impl SegmentData {
     fn new(sdi: OutputPin, rclk: OutputPin, srclk: OutputPin) -> Result<(), Box<dyn Error>> {
-        Outputs {
+        SegmentData {
             Gpio::new()?.get(SDI)?.into_output(),
             Gpio::new()?.get(RCLK)?.into_output(),
             Gpio::new()?.get(SRCLK)?.into_output(),
