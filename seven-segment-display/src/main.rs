@@ -17,15 +17,8 @@ struct SegmentData {
     srclk: OutputPin,
 };
 
-struct DigitData {
-    left: OutputPin,
-    midleft: OutputPin,
-    midright: OutputPin,
-    right: OutputPin,
-}
-
 impl SegmentData {
-    fn new(sdi: OutputPin, rclk: OutputPin, srclk: OutputPin) -> Result<(), Box<dyn Error>> {
+    fn new() -> Result<(), Box<dyn Error>> {
         SegmentData {
             Gpio::new()?.get(SDI)?.into_output(),
             Gpio::new()?.get(RCLK)?.into_output(),
@@ -34,15 +27,16 @@ impl SegmentData {
         Ok(())
     }
 
-    fn set(&self, data: u8) {
+    fn hc595_shfit(&mut self, _data: u8) {
+        let mut data = _data;
         for i in 0..8 {
+            data <<= i;
             self.sdi.write((data & 0x80) != 0);
-            self.srclk.write(true);
-            self.srclk.write(false);
-            data <<= 1;
+            self.srclk.set_high();
+            self.srclk.set_high();
         }
-        self.rclk.write(true);
-        self.rclk.write(false);
+        self.rclk.set_high();
+        self.rclk.set_low();
     }
 
     fn clear(&mut self) -> Result<(), Box<dyn Error>> {
@@ -53,6 +47,40 @@ impl SegmentData {
         }
         self.rclk.set_high();
         self.rclk.set_low();
+        Ok(())
+    }
+}
+
+struct DigitData {
+    left: OutputPin,
+    midleft: OutputPin,
+    midright: OutputPin,
+    right: OutputPin,
+}
+
+impl DigitData {
+    fn new() -> Result<(), Box<dyn Error>> {
+        DigitData {
+            Gpio::new()?.get(PLACE_PIN[0])?.into_output(),
+            Gpio::new()?.get(PLACE_PIN[1])?.into_output(),
+            Gpio::new()?.get(PLACE_PIN[2])?.into_output(),
+            Gpio::new()?.get(PLACE_PIN[3])?.into_output(),
+        }
+        Ok(())
+    }
+
+    fn pick_digit(&mut self, digit: u8) -> Result<(), Box<dyn Error>> {
+        self.left.set_low();
+        self.midleft.set_low();
+        self.midright.set_low();
+        self.right.set_low();
+        match digit {
+            0 => self.left.set_high(),
+            1 => self.midleft.set_high(),
+            2 => self.midright.set_high(),
+            3 => self.right.set_high(),
+            _ => (),
+        }        
         Ok(())
     }
 }
