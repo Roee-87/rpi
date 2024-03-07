@@ -2,13 +2,13 @@ use std::error::Error;
 use std::thread;
 use std::time::Duration;
 
-use rppal::gpio::{Gpio, OutputPin, Level};
+use rppal::gpio::{Gpio, Level, OutputPin};
 
 const SDI: u8 = 24;
 const RCLK: u8 = 23;
 const SRCLK: u8 = 18;
 
-const PLACE_PIN: [u8; 4] = [10, 22, 27, 17];
+const PLACE_PIN: [u8; 4] = [26, 22, 27, 17];
 const NUMBER: [u8; 10] = [0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8, 0x80, 0x90];
 
 struct SegmentData {
@@ -27,16 +27,20 @@ impl SegmentData {
     }
 
     fn hc595_shfit(&mut self, data: u8) {
-        for i in (0..8) {
-            //self.sdi.write((((data << i) & 0x80) == 0x80).into());
+        for i in 0..8 {
             match (((data << i) & 0x80) == 0x80) {
                 true => self.sdi.set_high(),
                 false => self.sdi.set_low(),
             }
-            //self.sdi.write(Level::Low);
             self.srclk.set_high();
             self.srclk.set_low();
-            println!("i: {} data: {} data << i: {} into: {}", i, data, data <<i,(((data << i) & 0x80) == 0x80));
+            // println!(
+            //     "i: {} data: {} data << i: {} into: {}",
+            //     i,
+            //     data,
+            //     data << i,
+            //     (((data << i) & 0x80) == 0x80)
+            // );
         }
         self.rclk.set_high();
         self.rclk.set_low();
@@ -44,7 +48,7 @@ impl SegmentData {
 
     fn clear(&mut self) {
         for _ in 0..8 {
-            self.sdi.set_high();
+            self.sdi.set_low();
             self.srclk.set_high();
             self.srclk.set_low();
         }
@@ -76,10 +80,18 @@ impl DigitData {
         self.midright.set_low();
         self.right.set_low();
         match digit {
-            0u8 => self.left.set_high(),
-            1u8 => self.midleft.set_high(),
-            2u8 => self.midright.set_high(),
-            3u8 => self.right.set_high(),
+            0u8 => {
+                self.left.set_high();
+            }
+            1u8 => {
+                self.midleft.set_high();
+            }
+            2u8 => {
+                self.midright.set_high();
+            }
+            3u8 => {
+                self.right.set_high();
+            }
             _ => (),
         }
     }
@@ -92,25 +104,25 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     loop {
         output_pins.clear();
-        data_pins.pick_digit(0u8);
-        output_pins.hc595_shfit(NUMBER[counter % 10]);
-        // println!("{}", NUMBER[counter % 10]);
-
-        output_pins.clear();
-        data_pins.pick_digit(1u8);
-        output_pins.hc595_shfit(NUMBER[(counter % 100) / 10]);
-        // println!("{}", NUMBER[(counter % 100) / 10]);
-
-        output_pins.clear();
-        data_pins.pick_digit(2u8);
-        output_pins.hc595_shfit(NUMBER[(counter % 1000) / 100]);
-        // println!("{}", NUMBER[(counter % 1000) / 100]);
-
-        output_pins.clear();
         data_pins.pick_digit(3u8);
-        output_pins.hc595_shfit(NUMBER[(counter % 10000) / 1000]);
-        // println!("{}", NUMBER[(counter % 10000) / 1000]);
-        
+        output_pins.hc595_shfit(NUMBER[counter % 10]);
+
+        // output_pins.clear();
+        // data_pins.pick_digit(2u8);
+        // output_pins.hc595_shfit(NUMBER[(counter % 100) / 10]);
+
+        // output_pins.clear();
+        // println!("midright level: {}", data_pins.midright.is_set_high());
+        // data_pins.pick_digit(1u8);
+        // println!("midright level: {}", data_pins.midright.is_set_high());
+        // output_pins.hc595_shfit(NUMBER[(counter % 1000) / 100]);
+
+        // output_pins.clear();
+        // println!("right level: {}", data_pins.right.is_set_high());
+        // data_pins.pick_digit(0u8);
+        // println!("right level: {}", data_pins.right.is_set_high());
+        // output_pins.hc595_shfit(NUMBER[(counter % 10000) / 1000]);
+
         thread::sleep(Duration::from_millis(1000));
         counter += 1;
     }
