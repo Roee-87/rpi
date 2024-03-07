@@ -52,7 +52,7 @@ fn set_color(hex_code: u32) -> Vec<f64> {
     let blue = (hex_code & 0x0000FF) as u8;
 
     let r_value = map_color(red);
-    let g_value = map_color(green); // Green is too bright and doesn't respond to modulating the duty cycle.
+    let g_value = map_color(green) / 5.0; // Green is too bright, so we divide by 5 in order to match intensity with red and blue LEDs
     let b_value = map_color(blue);
 
     vec![r_value, g_value, b_value]
@@ -61,6 +61,6 @@ fn set_color(hex_code: u32) -> Vec<f64> {
 fn map_color(input: u8) -> f64 {
     let input = input as f64;
     let input = input / 255.0;
-    let input = input * 100.0;
+    //let input = input * 100.0;
     input
 }
