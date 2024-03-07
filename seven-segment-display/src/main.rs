@@ -28,7 +28,7 @@ impl SegmentData {
 
     fn hc595_shfit(&mut self, data: u8) {
         for i in 0..8 {
-            match (((data << i) & 0x80) == 0x80) {
+            match ((data << i) & 0x80) == 0x80 {
                 true => self.sdi.set_high(),
                 false => self.sdi.set_low(),
             }
@@ -103,7 +103,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut counter = 0;
 
     loop {
-        for i in (0..4).rev() {
+        for i in 0..4 {
             data_pins.pick_digit(i as u8);
             output_pins.clear();
             match i {
@@ -113,8 +113,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 3 => output_pins.hc595_shfit(NUMBER[counter % 10]),
                 _ => (),
             }
-            thread::sleep(Duration::from_millis(1000));
         }
+        thread::sleep(Duration::from_millis(1000));
         counter += 1;
     }
     Ok(())
