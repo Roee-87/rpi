@@ -103,27 +103,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut counter = 0;
 
     loop {
-        output_pins.clear();
-        data_pins.pick_digit(3u8);
-        output_pins.hc595_shfit(NUMBER[counter % 10]);
-
-        // output_pins.clear();
-        // data_pins.pick_digit(2u8);
-        // output_pins.hc595_shfit(NUMBER[(counter % 100) / 10]);
-
-        // output_pins.clear();
-        // println!("midright level: {}", data_pins.midright.is_set_high());
-        // data_pins.pick_digit(1u8);
-        // println!("midright level: {}", data_pins.midright.is_set_high());
-        // output_pins.hc595_shfit(NUMBER[(counter % 1000) / 100]);
-
-        // output_pins.clear();
-        // println!("right level: {}", data_pins.right.is_set_high());
-        // data_pins.pick_digit(0u8);
-        // println!("right level: {}", data_pins.right.is_set_high());
-        // output_pins.hc595_shfit(NUMBER[(counter % 10000) / 1000]);
-
-        thread::sleep(Duration::from_millis(1000));
+        for i in (0..4).rev() {
+            data_pins.pick_digit(i as u8);
+            output_pins.clear();
+            match i {
+                0 => output_pins.hc595_shfit(NUMBER[(counter % 10000) / 1000]),
+                1 => output_pins.hc595_shfit(NUMBER[(counter % 1000) / 100]),
+                2 => output_pins.hc595_shfit(NUMBER[(counter % 100) / 10]),
+                3 => output_pins.hc595_shfit(NUMBER[counter % 10]),
+                _ => (),
+            }
+            thread::sleep(Duration::from_millis(1000));
+        }
         counter += 1;
     }
     Ok(())
