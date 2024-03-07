@@ -2,7 +2,7 @@ use std::error::Error;
 use std::thread;
 use std::time::Duration;
 
-use rppal::gpio::{Gpio, OutputPin};
+use rppal::gpio::{Gpio, OutputPin, Level};
 
 const SDI: u8 = 24;
 const RCLK: u8 = 23;
@@ -26,13 +26,17 @@ impl SegmentData {
         })
     }
 
-    fn hc595_shfit(&mut self, _data: u8) {
-        let mut data = _data;
-        for i in 0..8 {
-            data <<= i;
-            self.sdi.write(((data & 0x80) != 0).into());
+    fn hc595_shfit(&mut self, data: u8) {
+        for i in (0..8) {
+            //self.sdi.write((((data << i) & 0x80) == 0x80).into());
+            match (((data << i) & 0x80) == 0x80) {
+                true => self.sdi.set_high(),
+                false => self.sdi.set_low(),
+            }
+            //self.sdi.write(Level::Low);
             self.srclk.set_high();
-            self.srclk.set_high();
+            self.srclk.set_low();
+            println!("i: {} data: {} data << i: {} into: {}", i, data, data <<i,(((data << i) & 0x80) == 0x80));
         }
         self.rclk.set_high();
         self.rclk.set_low();
@@ -40,7 +44,7 @@ impl SegmentData {
 
     fn clear(&mut self) {
         for _ in 0..8 {
-            self.sdi.set_low();
+            self.sdi.set_high();
             self.srclk.set_high();
             self.srclk.set_low();
         }
@@ -59,10 +63,10 @@ struct DigitData {
 impl DigitData {
     fn new() -> Result<Self, Box<dyn Error>> {
         Ok(DigitData {
-            left: Gpio::new()?.get(PLACE_PIN[0])?.into_output(),
-            midleft: Gpio::new()?.get(PLACE_PIN[1])?.into_output(),
-            midright: Gpio::new()?.get(PLACE_PIN[2])?.into_output(),
-            right: Gpio::new()?.get(PLACE_PIN[3])?.into_output(),
+            left: Gpio::new()?.get(PLACE_PIN[3])?.into_output(),
+            midleft: Gpio::new()?.get(PLACE_PIN[2])?.into_output(),
+            midright: Gpio::new()?.get(PLACE_PIN[1])?.into_output(),
+            right: Gpio::new()?.get(PLACE_PIN[0])?.into_output(),
         })
     }
 
@@ -72,10 +76,10 @@ impl DigitData {
         self.midright.set_low();
         self.right.set_low();
         match digit {
-            0 => self.left.set_high(),
-            1 => self.midleft.set_high(),
-            2 => self.midright.set_high(),
-            3 => self.right.set_high(),
+            0u8 => self.left.set_high(),
+            1u8 => self.midleft.set_high(),
+            2u8 => self.midright.set_high(),
+            3u8 => self.right.set_high(),
             _ => (),
         }
     }
@@ -88,20 +92,24 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     loop {
         output_pins.clear();
-        data_pins.pick_digit(0);
+        data_pins.pick_digit(0u8);
         output_pins.hc595_shfit(NUMBER[counter % 10]);
+        // println!("{}", NUMBER[counter % 10]);
 
         output_pins.clear();
-        data_pins.pick_digit(1);
+        data_pins.pick_digit(1u8);
         output_pins.hc595_shfit(NUMBER[(counter % 100) / 10]);
+        // println!("{}", NUMBER[(counter % 100) / 10]);
 
         output_pins.clear();
-        data_pins.pick_digit(2);
+        data_pins.pick_digit(2u8);
         output_pins.hc595_shfit(NUMBER[(counter % 1000) / 100]);
+        // println!("{}", NUMBER[(counter % 1000) / 100]);
 
         output_pins.clear();
-        data_pins.pick_digit(3);
+        data_pins.pick_digit(3u8);
         output_pins.hc595_shfit(NUMBER[(counter % 10000) / 1000]);
+        // println!("{}", NUMBER[(counter % 10000) / 1000]);
         
         thread::sleep(Duration::from_millis(1000));
         counter += 1;
