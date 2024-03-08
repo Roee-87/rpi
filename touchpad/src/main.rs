@@ -12,8 +12,37 @@ const keys: [char; 16] = keys = [
 ];
 
 struct Keypad {
-    rows: [OutputPin; 4],
-    cols: [InputPin; 4],
+    rows: Vec::from([OutputPin; 4]),
+    cols: Vec::from([InputPin; 4]),
+}
+
+impl Keypad {
+    fn new() -> Result<Keypad, Box<dyn Error>> {
+        let mut rows: Vec<OutputPin> = Vec::with_capacity(4);
+        let mut cols: Vec<InputPin> = Vec::with_capacity(4);
+        let gpio = Gpio::new()?;
+
+        for i in 0..4 {
+            rows.push(gpio.get(ROW_PINS[i])?.into_output());
+            cols.push(gpio.get(COL_PINS[i])?.into_input());
+        }
+
+        Ok(Keypad { rows, cols })
+    }
+
+    fn read(&self) -> Option<char> {
+        for i in 0..4 {
+            self.rows[i].set_high();
+            for j in 0..4 {
+                if self.cols[j].is_low() {
+                    return Some(keys[i * 4 + j]);
+                }
+            }
+            self.rows[i].set_low();
+        }
+        None
+    }
+
 }
 
 fn main() {
