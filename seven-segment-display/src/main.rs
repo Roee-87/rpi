@@ -35,13 +35,6 @@ impl SegmentData {
             }
             self.srclk.set_high();
             self.srclk.set_low();
-            // println!(
-            //     "i: {} data: {} data << i: {} into: {}",
-            //     i,
-            //     data,
-            //     data << i,
-            //     (((data << i) & 0x80) == 0x80)
-            // );
         }
         self.rclk.set_high();
         self.rclk.set_low();
