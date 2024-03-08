@@ -7,13 +7,13 @@ use rppal::gpio::{Gpio, InputPin, OutputPin};
 
 const ROW_PINS: [u8; 4] = [18, 23, 24, 25];
 const COL_PINS: [u8; 4] = [10, 22, 27, 17];
-const keys: [char; 16] = keys = [
-    "1", "2", "3", "A", "4", "5", "6", "B", "7", "8", "9", "C", "*", "0", "#", "D",
+const keys: [char; 16] = [
+    '1', '2', '3', 'A', '4', '5', '6', 'B', '7', '8', '9', 'C', '*', '0', '#', 'D',
 ];
 
 struct Keypad {
-    rows: Vec::from([OutputPin; 4]),
-    cols: Vec::from([InputPin; 4]),
+    rows: Vec<OutputPin>,
+    cols: Vec<InputPin>,
 }
 
 impl Keypad {
@@ -30,7 +30,7 @@ impl Keypad {
         Ok(Keypad { rows, cols })
     }
 
-    fn read(&self) -> Option<char> {
+    fn read(&mut self) -> Option<char> {
         for i in 0..4 {
             self.rows[i].set_high();
             for j in 0..4 {
