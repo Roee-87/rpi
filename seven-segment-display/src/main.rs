@@ -99,12 +99,13 @@ impl DigitData {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut output_pins = SegmentData::new()?;
-    let mut data_pins = DigitData::new()?;
+    let mut digit_pins = DigitData::new()?;
+    let mut mini_counter = 0;
     let mut counter = 0;
 
     loop {
         for i in 0..4 {
-            data_pins.pick_digit(i as u8);
+            digit_pins.pick_digit(i as u8);
             output_pins.clear();
             match i {
                 0 => output_pins.hc595_shfit(NUMBER[(counter % 10000) / 1000]),
@@ -113,9 +114,12 @@ fn main() -> Result<(), Box<dyn Error>> {
                 3 => output_pins.hc595_shfit(NUMBER[counter % 10]),
                 _ => (),
             }
+            thread::sleep(Duration::from_millis(1));
+            mini_counter += 1;
         }
-        thread::sleep(Duration::from_millis(1000));
-        counter += 1;
+        if mini_counter % 1000 == 0 {
+            counter += 1;
+        }
     }
     Ok(())
 }
