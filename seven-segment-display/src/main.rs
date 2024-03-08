@@ -106,7 +106,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     loop {
         for i in 0..4 {
             digit_pins.pick_digit(i as u8);
-            output_pins.clear();
+            //output_pins.clear();
             match i {
                 0 => output_pins.hc595_shfit(NUMBER[(counter % 10000) / 1000]),
                 1 => output_pins.hc595_shfit(NUMBER[(counter % 1000) / 100]),
@@ -114,6 +114,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 3 => output_pins.hc595_shfit(NUMBER[counter % 10]),
                 _ => (),
             }
+
+            // Need to wait for a short time increment to allow for the display to stabilize
             thread::sleep(Duration::from_millis(1));
             mini_counter += 1;
         }
