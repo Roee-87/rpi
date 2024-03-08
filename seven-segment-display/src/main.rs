@@ -1,8 +1,9 @@
+use ctrlc;
 use std::error::Error;
 use std::thread;
 use std::time::Duration;
 
-use rppal::gpio::{Gpio, Level, OutputPin};
+use rppal::gpio::{Gpio, OutputPin};
 
 const SDI: u8 = 24;
 const RCLK: u8 = 23;
@@ -74,11 +75,15 @@ impl DigitData {
         })
     }
 
-    fn pick_digit(&mut self, digit: u8) {
+    fn set_low(&mut self) {
         self.left.set_low();
         self.midleft.set_low();
         self.midright.set_low();
         self.right.set_low();
+    }
+
+    fn pick_digit(&mut self, digit: u8) {
+        self.set_low();
         match digit {
             0u8 => {
                 self.left.set_high();
@@ -103,7 +108,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut mini_counter = 0;
     let mut counter = 0;
 
-    loop {
+    // Ctrl-C handler
+    let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
+    let r = running.clone();
+    ctrlc::set_handler(move || {
+        r.store(false, std::sync::atomic::Ordering::SeqCst);
+    })?;
+
+    println!("Press Ctrl-C to stop");
+
+    while running.load(std::sync::atomic::Ordering::SeqCst) {
         for i in 0..4 {
             digit_pins.pick_digit(i as u8);
             output_pins.clear();
@@ -123,5 +137,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             counter += 1;
         }
     }
+    output_pins.clear();
+    digit_pins.set_low();
     Ok(())
 }
