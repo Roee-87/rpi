@@ -29,6 +29,7 @@ impl Keypad {
         }
 
         let keys: Vec<char> = Vec::from(KEYS);
+        println!("Keypad initialized with keys: {:?}", keys);
 
         Ok(Keypad { rows, cols, keys })
     }
@@ -38,18 +39,20 @@ impl Keypad {
         for i in 0..4 {
             self.rows[i].set_high();
             for j in 0..4 {
-                if self.cols[j].is_low() {
+                if self.cols[j].is_high() {
                     pressed_keys.push(self.keys[i * 4 + j]);
+
+                    // println!("keypad row {} is low: {}", i, self.rows[i].is_set_low());
+                    // println!("keypad col {} is low: {}", j, self.cols[j].is_low());
                 }
             }
             self.rows[i].set_low();
         }
         Some(pressed_keys)
     }
-
 }
 
-fn main() -> Result<(), Box<dyn Error>>{
+fn main() -> Result<(), Box<dyn Error>> {
     let mut last_key_pressed = Vec::new();
     let mut keypad = Keypad::new()?;
 
@@ -60,15 +63,15 @@ fn main() -> Result<(), Box<dyn Error>>{
         r.store(false, std::sync::atomic::Ordering::SeqCst);
     })?;
 
-    
     while running.load(std::sync::atomic::Ordering::SeqCst) {
         let pressed_keys = keypad.read().ok_or("Error reading keypad")?;
         if pressed_keys != last_key_pressed && !pressed_keys.is_empty() {
-            println!("{:?}", pressed_keys);
+            println!("{}", pressed_keys[0]);
         }
         last_key_pressed = pressed_keys;
-        
+
         thread::sleep(Duration::from_millis(100));
     }
+    println!("  Exiting the program...");
     Ok(())
 }
