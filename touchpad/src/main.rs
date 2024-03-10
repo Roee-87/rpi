@@ -41,9 +41,6 @@ impl Keypad {
             for j in 0..4 {
                 if self.cols[j].is_high() {
                     pressed_keys.push(self.keys[i * 4 + j]);
-
-                    // println!("keypad row {} is low: {}", i, self.rows[i].is_set_low());
-                    // println!("keypad col {} is low: {}", j, self.cols[j].is_low());
                 }
             }
             self.rows[i].set_low();
@@ -52,13 +49,6 @@ impl Keypad {
     }
 }
 
-struct ADC{
-    // TODO: Define ADC
-}
-
-impl ADC{
-    // Define ADC methods
-}
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut last_key_pressed = Vec::new();
