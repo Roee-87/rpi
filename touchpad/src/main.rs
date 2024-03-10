@@ -52,6 +52,14 @@ impl Keypad {
     }
 }
 
+struct ADC{
+    // TODO: Define ADC
+}
+
+impl ADC{
+    // Define ADC methods
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let mut last_key_pressed = Vec::new();
     let mut keypad = Keypad::new()?;
